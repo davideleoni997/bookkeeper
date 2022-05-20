@@ -22,6 +22,8 @@
     <groupId>org.apache.bookkeeper</groupId>
     <version>4.16.0-SNAPSHOT</version>
   </parent>
+
+
   <artifactId>bookkeeper-server</artifactId>
   <name>Apache BookKeeper :: Server</name>
   <dependencies>
@@ -79,10 +81,10 @@
       <artifactId>netty-handler</artifactId>
     </dependency>
     <dependency>
-        <groupId>io.netty</groupId>
-        <artifactId>netty-transport-native-epoll</artifactId>
-        <classifier>linux-x86_64</classifier>
-      </dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-transport-native-epoll</artifactId>
+      <classifier>linux-x86_64</classifier>
+    </dependency>
     <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty-tcnative-boringssl-static</artifactId>
@@ -162,28 +164,28 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-        <groupId>org.apache.kerby</groupId>
-        <artifactId>kerby-config</artifactId>
-        <version>${kerby.version}</version>
-        <scope>test</scope>
-        <exclusions>
-            <exclusion>
-                <groupId>org.slf4j</groupId>
-                <artifactId>*</artifactId>
-            </exclusion>
-        </exclusions>
+      <groupId>org.apache.kerby</groupId>
+      <artifactId>kerby-config</artifactId>
+      <version>${kerby.version}</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
-        <groupId>org.apache.kerby</groupId>
-        <artifactId>kerb-simplekdc</artifactId>
-        <version>${kerby.version}</version>
-        <scope>test</scope>
-        <exclusions>
-            <exclusion>
-                <groupId>org.slf4j</groupId>
-                <artifactId>*</artifactId>
-            </exclusion>
-        </exclusions>
+      <groupId>org.apache.kerby</groupId>
+      <artifactId>kerb-simplekdc</artifactId>
+      <version>${kerby.version}</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.zookeeper</groupId>
@@ -192,10 +194,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-       <!-- needed by ZooKeeper server tests utilities -->
-       <groupId>org.junit.jupiter</groupId>
-       <artifactId>junit-jupiter-api</artifactId>
-       <scope>test</scope>
+      <!-- needed by ZooKeeper server tests utilities -->
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.bookkeeper.stats</groupId>
@@ -209,6 +212,7 @@
       <version>${project.parent.version}</version>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
   <build>
     <plugins>
@@ -259,10 +263,10 @@
         <version>${maven-surefire-plugin.version}</version>
         <configuration>
           <trimStackTrace>false</trimStackTrace>
+          <testFailureIgnore>true</testFailureIgnore>
+          <rerunFailingTestsCount>0</rerunFailingTestsCount>
           <properties>
             <property>
-              <name>listener</name>
-              <value>org.apache.bookkeeper.common.testing.util.TimedOutTestsListener</value>
             </property>
           </properties>
         </configuration>
@@ -293,60 +297,139 @@
       </plugin>
     </plugins>
   </build>
-  <profiles>
-    <profile>
-      <id>vertx-http-server</id>
-      <dependencies>
-        <dependency>
-          <groupId>org.apache.bookkeeper.http</groupId>
-          <artifactId>vertx-http-server</artifactId>
-          <version>${project.parent.version}</version>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>tls-certs</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>Generate Self-Signed Certificates</id>
-                <phase>generate-test-resources</phase>
-                <goals>
-                  <goal>exec</goal>
-                </goals>
-                <configuration>
-                  <workingDirectory>${basedir}/src/test/resources</workingDirectory>
-                  <executable>${basedir}/src/test/resources/generateKeysAndCerts.sh</executable>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <!-- test profiles -->
-    <profile>
-      <id>skipBookKeeperServerTests</id>
-      <activation>
-        <property>
-          <name>skipBookKeeperServerTests</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <skipTests>true</skipTests>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
+<profiles>
+  <profile>
+    <id>jacoco</id>
+    <build>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${maven-surefire-plugin.version}</version>
+          <configuration>
+            <argLine>@{argLine}</argLine>
+            <trimStackTrace>false</trimStackTrace>
+            <testFailureIgnore>true</testFailureIgnore>
+            <rerunFailingTestsCount>0</rerunFailingTestsCount>
+            <properties>
+              <property>
+              </property>
+            </properties>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>0.8.6</version>
+          <executions>
+            <execution>
+              <id>prepare-agent</id>
+              <goals>
+                <goal>prepare-agent</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>report</id>
+              <phase>test</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </build>
+  </profile>
+  <profile>
+    <id>badua</id>
+    <properties>
+      <argLine>-javaagent:target/dependency/ba-dua-agent-0.6.0-runtime.jar -Doutput.file=target/badua.ser</argLine>
+
+    </properties>
+    <dependencies>
+      <dependency>
+        <groupId>br.usp.each.saeg</groupId>
+        <artifactId>ba-dua</artifactId>
+        <version>0.6.0</version>
+        <type>zip</type>
+      </dependency>
+    </dependencies>
+    <build>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.10</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>copy</goal>
+              </goals>
+              <configuration>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>br.usp.each.saeg</groupId>
+                    <artifactId>ba-dua-agent</artifactId>
+                    <classifier>runtime</classifier>
+                    <version>0.6.0</version>
+                  </artifactItem>
+                </artifactItems>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>1.6.0</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>java</goal>
+              </goals>
+              <phase>verify</phase>
+              <configuration>
+                <mainClass>br.usp.each.saeg.badua.cli.Report</mainClass>
+                <arguments>
+                  <argument>-input</argument>
+                  <argument>${project.build.directory}/badua.ser</argument>
+                  <argument>-classes</argument>
+                  <argument>${project.build.outputDirectory}</argument>
+                  <argument>-show-classes</argument>
+                  <argument>-show-methods</argument>
+                  <argument>-xml</argument>
+                  <argument>${project.build.directory}/badua.xml</argument>
+                </arguments>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <!-- Using this version to support requireFileChecksum with Java 6 -->
+          <version>3.0.0-M1</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+              <phase>verify</phase>
+              <configuration>
+                <rules>
+                  <requireFileChecksum>
+                    <file>${project.build.directory}/badua.xml</file>
+                    <checksum>b481fddd94ffd06b62a1f717bdfa9f72</checksum>
+                    <type>md5</type>
+                  </requireFileChecksum>
+                </rules>
+                <fail>true</fail>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+    </plugins>
+    </build>
+  </profile>
+</profiles>
 </project>
