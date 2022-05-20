@@ -1,6 +1,7 @@
 package org.apache.bookkeeper.bookie;
 
 
+import org.junit.After;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
@@ -14,6 +15,8 @@ import java.nio.ByteBuffer;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 @RunWith(value= Parameterized.class)
@@ -24,17 +27,16 @@ public class FileInfoTest {
 
     private File oldFile;
 
-
     @Parameterized.Parameters
     public static Collection<Object[]> testParameters() throws IOException {
-        File baseFile = File.createTempFile("test","file");
+        File baseFileEqual = File.createTempFile("test","file");
         return Arrays.asList(new Object[][]{
-                //{baseFile,File.createTempFile("new","file"),Long.MAX_VALUE},
-                //{baseFile,File.createTempFile("new","file"),0},
-                {baseFile,File.createTempFile("new","file"),-1},
-                {baseFile,null,Long.MAX_VALUE},
-                {baseFile,null,0},
-                {baseFile,baseFile,0},
+                {File.createTempFile("first","file"),File.createTempFile("new","stuff"),Long.MAX_VALUE},
+                {File.createTempFile("second","file"),File.createTempFile("another","thing"),0},
+                {File.createTempFile("third","file"),File.createTempFile("third","coso"),60},
+                {File.createTempFile("fourth","file"),null,Long.MAX_VALUE},
+                {File.createTempFile("fifth","test"),null,0},
+               {baseFileEqual,baseFileEqual,Long.MAX_VALUE},
 
         });
     }
@@ -46,6 +48,8 @@ public class FileInfoTest {
     private void configure(File basedir, File newFile,long size) throws IOException {
         FileInfo fi = new FileInfo(basedir,"1".getBytes(),0);
 
+        if(newFile != null && newFile.getName().contains("third"))
+            newFile.setReadOnly();
 
         this.newFile = newFile;
         this.size = size;
@@ -56,7 +60,7 @@ public class FileInfoTest {
 
     @Test
     public void test_moveToNew() throws IOException {
-
+    Logger.getGlobal().log(Level.INFO,"Base " + fi.getLf().getName());
         if(newFile != oldFile)
             if(newFile == null)
                 Assert.assertThrows(NullPointerException.class,()->{

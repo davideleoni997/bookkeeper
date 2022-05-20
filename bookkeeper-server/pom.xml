@@ -347,37 +347,10 @@
 
     </properties>
     <dependencies>
-      <dependency>
-        <groupId>br.usp.each.saeg</groupId>
-        <artifactId>ba-dua</artifactId>
-        <version>0.6.0</version>
-        <type>zip</type>
-      </dependency>
+
     </dependencies>
     <build>
       <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.10</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>copy</goal>
-              </goals>
-              <configuration>
-                <artifactItems>
-                  <artifactItem>
-                    <groupId>br.usp.each.saeg</groupId>
-                    <artifactId>ba-dua-agent</artifactId>
-                    <classifier>runtime</classifier>
-                    <version>0.6.0</version>
-                  </artifactItem>
-                </artifactItems>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
