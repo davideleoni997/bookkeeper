@@ -26,6 +26,11 @@
 
   <artifactId>bookkeeper-server</artifactId>
   <name>Apache BookKeeper :: Server</name>
+
+  <properties>
+    <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.bookkeeper</groupId>
@@ -295,9 +300,52 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+      <groupId>org.pitest</groupId>
+      <artifactId>pitest-maven</artifactId>
+      <version>1.6.2</version>
+      <configuration>
+      <targetClasses>
+        <param>org.apache.bookkeeper.bookie.storage.ldb.WriteCache</param>
+        <param>org.apache.bookkeeper.bookie.storage.ldb.LedgerMetadataIndex</param>
+      </targetClasses>
+      <targetTests>
+        <param>org.apache.bookkeeper.mytests.WriteCachePutTest</param>
+        <param>org.apache.bookkeeper.mytests.WriteCacheGetTest</param>
+        <param>org.apache.bookkeeper.mytests.LedgerMetadataIndexSetTest</param>
+        <param>org.apache.bookkeeper.mytests.LedgerMetadataIndexGetTest</param>
+        <param>org.apache.bookkeeper.mytests.LedgerMetadataIndexSetFencedTest</param>
+        <param>org.apache.bookkeeper.mytests.LedgerMetadataIndexSetMasterKeyTest</param>
+      </targetTests>
+      </configuration>
+      </plugin>
     </plugins>
   </build>
 <profiles>
+  <profile>
+    <id>mutation</id>
+    <activation>
+      <activeByDefault>false</activeByDefault>
+    </activation>
+    <build>
+      <pluginManagement>
+        <plugins>
+          <plugin>
+            <groupId>org.pitest</groupId>
+            <artifactId>pitest-maven</artifactId>
+            <executions>
+              <execution>
+                <id>pit-report</id>
+                <goals>
+                  <goal>mutationCoverage</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </pluginManagement>
+    </build>
+  </profile>
   <profile>
     <id>jacoco</id>
     <build>
@@ -342,66 +390,26 @@
   </profile>
   <profile>
     <id>badua</id>
-    <properties>
-      <argLine>-javaagent:target/dependency/ba-dua-agent-0.6.0-runtime.jar -Doutput.file=target/badua.ser</argLine>
-
-    </properties>
     <dependencies>
 
     </dependencies>
     <build>
       <plugins>
         <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>exec-maven-plugin</artifactId>
-          <version>1.6.0</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>java</goal>
-              </goals>
-              <phase>verify</phase>
-              <configuration>
-                <mainClass>br.usp.each.saeg.badua.cli.Report</mainClass>
-                <arguments>
-                  <argument>-input</argument>
-                  <argument>${project.build.directory}/badua.ser</argument>
-                  <argument>-classes</argument>
-                  <argument>${project.build.outputDirectory}</argument>
-                  <argument>-show-classes</argument>
-                  <argument>-show-methods</argument>
-                  <argument>-xml</argument>
-                  <argument>${project.build.directory}/badua.xml</argument>
-                </arguments>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-enforcer-plugin</artifactId>
-          <!-- Using this version to support requireFileChecksum with Java 6 -->
-          <version>3.0.0-M1</version>
+          <artifactId>maven-surefire-plugin</artifactId>
           <executions>
             <execution>
               <goals>
-                <goal>enforce</goal>
+                <goal>test</goal>
               </goals>
-              <phase>verify</phase>
-              <configuration>
-                <rules>
-                  <requireFileChecksum>
-                    <file>${project.build.directory}/badua.xml</file>
-                    <checksum>b481fddd94ffd06b62a1f717bdfa9f72</checksum>
-                    <type>md5</type>
-                  </requireFileChecksum>
-                </rules>
-                <fail>true</fail>
-              </configuration>
             </execution>
           </executions>
+          <configuration>
+            <argLine>-javaagent:src/test/resources/ba-dua-agent-rt-0.6.0-all.jar -Doutput.file=target/badua.ser</argLine>
+          </configuration>
         </plugin>
-    </plugins>
+      </plugins>
     </build>
   </profile>
 </profiles>
