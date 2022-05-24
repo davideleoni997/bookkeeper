@@ -34,7 +34,7 @@ public class FileInfoReadAbsoluteTest {
                 {null,0,true,"data",0,true},
                 {ByteBuffer.allocate(0),0,true,"hello",0,true},
                 {ByteBuffer.allocate(6),0,false,"false",0,true},
-                {ByteBuffer.allocate(6),0,true,"false",5,false},
+                {ByteBuffer.allocate(50),0,true,"false",5,false},
 
         });
     }
