@@ -35,7 +35,7 @@
                             <execution>
                                 <id>report</id>
                                 <goals>
-                                    <goal>report-aggregate</goal>
+                                    <goal>report</goal>
                                 </goals>
                                 <phase>verify</phase>
                             </execution>
