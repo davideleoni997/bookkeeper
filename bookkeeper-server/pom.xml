@@ -217,6 +217,12 @@
       <version>${project.parent.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.pitest</groupId>
+      <artifactId>pitest-maven</artifactId>
+      <version>1.6.2</version>
+      <type>maven-plugin</type>
+    </dependency>
 
   </dependencies>
   <build>
@@ -317,24 +323,44 @@
 
       </targetTests>
       </configuration>
+        <executions>
+          <execution>
+            <phase>test-compile</phase>
+            <goals>
+              <goal>mutationCoverage</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
 <profiles>
   <profile>
     <id>mutation</id>
-    <activation>
-      <activeByDefault>false</activeByDefault>
-    </activation>
     <build>
       <pluginManagement>
         <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>${maven-surefire-plugin.version}</version>
+            <configuration>
+              <argLine>@{argLine}</argLine>
+              <trimStackTrace>false</trimStackTrace>
+              <testFailureIgnore>true</testFailureIgnore>
+              <rerunFailingTestsCount>0</rerunFailingTestsCount>
+              <properties>
+                <property>
+                </property>
+              </properties>
+            </configuration>
+          </plugin>
           <plugin>
             <groupId>org.pitest</groupId>
             <artifactId>pitest-maven</artifactId>
             <executions>
               <execution>
-                <id>pit-report</id>
+                <id>report</id>
                 <goals>
                   <goal>mutationCoverage</goal>
                 </goals>

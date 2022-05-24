@@ -33,7 +33,7 @@ public class FileInfoTest {
         return Arrays.asList(new Object[][]{
                 {File.createTempFile("first","file"),File.createTempFile("new","stuff"),Long.MAX_VALUE},
                 {File.createTempFile("second","file"),File.createTempFile("another","thing"),0},
-                {File.createTempFile("third","file"),File.createTempFile("third","coso"),60},
+                {File.createTempFile("third","file"),File.createTempFile("third","coso.idx"),60},
                 {File.createTempFile("fourth","file"),null,Long.MAX_VALUE},
                 {File.createTempFile("fifth","test"),null,0},
                {baseFileEqual,baseFileEqual,Long.MAX_VALUE},
