@@ -306,16 +306,15 @@
       <version>1.6.2</version>
       <configuration>
       <targetClasses>
-        <param>org.apache.bookkeeper.bookie.storage.ldb.WriteCache</param>
+        <param>org.apache.bookkeeper.bookie.FileInfo</param>
         <param>org.apache.bookkeeper.bookie.storage.ldb.LedgerMetadataIndex</param>
       </targetClasses>
       <targetTests>
-        <param>org.apache.bookkeeper.mytests.WriteCachePutTest</param>
-        <param>org.apache.bookkeeper.mytests.WriteCacheGetTest</param>
-        <param>org.apache.bookkeeper.mytests.LedgerMetadataIndexSetTest</param>
-        <param>org.apache.bookkeeper.mytests.LedgerMetadataIndexGetTest</param>
-        <param>org.apache.bookkeeper.mytests.LedgerMetadataIndexSetFencedTest</param>
-        <param>org.apache.bookkeeper.mytests.LedgerMetadataIndexSetMasterKeyTest</param>
+        <param>org.apache.bookkeeper.bookie.FileInfoReadAbsoluteTest</param>
+        <param>org.apache.bookkeeper.bookie.FileInfoTest</param>
+        <param>org.apache.bookkeeper.bookie.storage.ldb.LedgerMdIndexSetMasterTest</param>
+        <param>org.apache.bookkeeper.bookie.storage.ldb.LedgerMdIndexSetTest</param>
+
       </targetTests>
       </configuration>
       </plugin>
