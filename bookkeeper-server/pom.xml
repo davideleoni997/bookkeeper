@@ -396,6 +396,9 @@
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
           <version>0.8.6</version>
+          <configuration>
+            <outputDirectory>${basedir}/../${aggregate.report.dir}</outputDirectory>
+          </configuration>
           <executions>
             <execution>
               <id>prepare-agent</id>
