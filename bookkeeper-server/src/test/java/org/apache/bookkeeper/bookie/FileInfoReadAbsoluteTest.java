@@ -1,6 +1,8 @@
 package org.apache.bookkeeper.bookie;
 
 
+import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
@@ -14,6 +16,7 @@ import java.nio.ByteBuffer;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 
 @RunWith(value= Parameterized.class)
@@ -26,56 +29,60 @@ public class FileInfoReadAbsoluteTest {
 
 
     @Parameterized.Parameters
-    public static Collection<Object[]> testParameters(){
+    public static Collection<Object[]> testParameters() {
         return Arrays.asList(new Object[][]{
-                {ByteBuffer.allocate(6),0,true,"header",6,true},
-                {ByteBuffer.allocate(6),0,true,"",0,true},
-                {ByteBuffer.allocate(6),-1,true,"",0,true},
-                {null,0,true,"data",0,true},
-                {ByteBuffer.allocate(0),0,true,"hello",0,true},
-                {ByteBuffer.allocate(6),0,false,"false",0,true},
-                {ByteBuffer.allocate(50),0,true,"false",5,false},
+                {ByteBuffer.allocate(6), 0, true, "header", 6, true},
+                {ByteBuffer.allocate(6), 0, true, "", 0, true},
+                {ByteBuffer.allocate(6), -1, true, "", 0, true},
+                {null, 0, true, "data", 0, true},
+                {ByteBuffer.allocate(0), 0, true, "hello", 0, true},
+                {ByteBuffer.allocate(6), 0, false, "false", 0, true},
+                {ByteBuffer.allocate(9), 3, true, "longerdata", 7, true},
+                {ByteBuffer.allocate(6), -1025, true, "", 0, true},
+                {ByteBuffer.allocate(6), 0, true, "false", 5, false},
 
         });
     }
 
     public FileInfoReadAbsoluteTest(ByteBuffer bb, long position, boolean bestEffort, String data, long read, boolean fc) throws IOException {
-        configure(bb, position,bestEffort,data,read,fc);
+        configure(bb, position, bestEffort, data, read, fc);
     }
 
-    private void configure(ByteBuffer bb, long position,boolean bestEffort,String data,long read,boolean fc) throws IOException {
-        File basedir = File.createTempFile("test","file");
-        FileInfo fi = new FileInfo(basedir,"1".getBytes(),0);
+    private void configure(ByteBuffer bb, long position, boolean bestEffort, String data, long read, boolean fc) throws IOException {
+        File basedir = File.createTempFile("test", "file");
+        FileInfo fi = new FileInfo(basedir, "1".getBytes(), 0);
         ByteBuffer[] arr = {ByteBuffer.wrap(data.getBytes())};
 
-        fi.write(arr,0);
+        fi.write(arr, 0);
 
-        if (!fc){
-            fi.close(false);
+        if (!fc) {
+            fi.close(true);
         }
 
         this.bb = bb;
         this.position = position;
         this.bestEffort = bestEffort;
-        this.fi=fi;
+        this.fi = fi;
         this.read = read;
     }
-
-
 
     @Test
     public void test_readAbsol() throws IOException {
 
-        if(bb!=null) {
+        if (position < -1024)
+            Assert.assertThrows(IllegalArgumentException.class, () -> {
+                fi.read(bb, position, bestEffort);
+            });
+        else if (bb != null) {
             if (bestEffort)
                 Assert.assertEquals(read, fi.read(bb, position, bestEffort));
             else
                 Assert.assertThrows(ShortReadException.class, () -> {
                     fi.read(bb, position, bestEffort);
                 });
-        }
-        else Assert.assertThrows(NullPointerException.class,() ->{
-            fi.read(bb,position,bestEffort);
+        } else Assert.assertThrows(NullPointerException.class, () -> {
+            fi.read(bb, position, bestEffort);
         });
     }
+
 }

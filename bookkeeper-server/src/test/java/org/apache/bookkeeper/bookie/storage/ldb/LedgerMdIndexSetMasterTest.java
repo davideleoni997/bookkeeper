@@ -14,6 +14,7 @@ import java.nio.ByteBuffer;
 import java.util.*;
 
 import org.mockito.Mock;
+import org.mockito.internal.matchers.Null;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -39,10 +40,12 @@ public class LedgerMdIndexSetMasterTest {
     public static Collection<Object[]> testParameters(){
 
         return Arrays.asList(new Object[][]{
-                {1,"chiave".getBytes(),false},
-                {2,"key".getBytes(),true},
-                {-1,"".getBytes(),false} //dovrei testare anche se chiave configurata può essere cambiata?
-
+                {-1,"".getBytes(),false},
+                {1,"key".getBytes(),false},
+                {1,"".getBytes(),false},
+                {1,null,false},
+                {1,"key".getBytes(),true},
+                {1,"chiave".getBytes(),true},
         });
     }
 
@@ -58,7 +61,7 @@ public class LedgerMdIndexSetMasterTest {
         ByteBuffer buf = ByteBuffer.allocate(8);
         buf.putLong(ledgerId); //make the id a byte array to use as a key
         if(isKeySet)
-            ledger.put(buf.array(),DbLedgerStorageDataFormats.LedgerData.newBuilder().setExists(true).setFenced(false).setMasterKey(ByteString.copyFrom(key)).build().toByteArray());
+            ledger.put(buf.array(),DbLedgerStorageDataFormats.LedgerData.newBuilder().setExists(true).setFenced(false).setMasterKey(ByteString.copyFrom("chiave".getBytes())).build().toByteArray());
         else// 0 bytes array
             ledger.put(buf.array(),DbLedgerStorageDataFormats.LedgerData.newBuilder().setExists(true).setFenced(false).setMasterKey(ByteString.copyFrom(new byte[]{0,0})).build().toByteArray());
 
@@ -84,7 +87,10 @@ public class LedgerMdIndexSetMasterTest {
            lmi.setMasterKey(this.id, this.key);
            Assert.assertEquals(ByteBuffer.wrap(this.key), ByteBuffer.wrap(lmi.get(this.id).getMasterKey().toByteArray()));
        } catch (Exception e){
-           Assert.assertEquals(e.getClass(),IOException.class);
+           if(this.key == null)
+                Assert.assertEquals(e.getClass(),NullPointerException.class);
+           else
+               Assert.assertEquals(e.getClass(), IOException.class);
        }
 
 

@@ -220,13 +220,8 @@
       <version>${project.parent.version}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.pitest</groupId>
-      <artifactId>pitest-maven</artifactId>
-      <version>1.6.2</version>
-      <type>maven-plugin</type>
-    </dependency>
-
+   <!--
+    -->
   </dependencies>
   <build>
     <plugins>
@@ -309,38 +304,49 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-      <groupId>org.pitest</groupId>
-      <artifactId>pitest-maven</artifactId>
-      <version>1.6.2</version>
-      <configuration>
-      <targetClasses>
-        <param>org.apache.bookkeeper.bookie.FileInfo</param>
-        <param>org.apache.bookkeeper.bookie.storage.ldb.LedgerMetadataIndex</param>
-      </targetClasses>
-      <targetTests>
-        <param>org.apache.bookkeeper.bookie.FileInfoReadAbsoluteTest</param>
-        <param>org.apache.bookkeeper.bookie.FileInfoTest</param>
-        <param>org.apache.bookkeeper.bookie.storage.ldb.LedgerMdIndexSetMasterTest</param>
-        <param>org.apache.bookkeeper.bookie.storage.ldb.LedgerMdIndexSetTest</param>
 
-      </targetTests>
-      </configuration>
-        <executions>
-          <execution>
-            <phase>test-compile</phase>
-            <goals>
-              <goal>mutationCoverage</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
 <profiles>
   <profile>
     <id>mutation</id>
+    <dependencies>
+      <dependency>
+        <groupId>org.pitest</groupId>
+        <artifactId>pitest-maven</artifactId>
+        <version>1.6.2</version>
+        <type>maven-plugin</type>
+      </dependency>
+    </dependencies>
     <build>
+      <plugins>
+        <plugin>
+          <groupId>org.pitest</groupId>
+          <artifactId>pitest-maven</artifactId>
+          <version>1.6.2</version>
+          <configuration>
+            <targetClasses>
+              <param>org.apache.bookkeeper.bookie.FileInfo</param>
+              <param>org.apache.bookkeeper.bookie.storage.ldb.LedgerMetadataIndex</param>
+            </targetClasses>
+            <targetTests>
+              <param>org.apache.bookkeeper.bookie.FileInfoReadAbsoluteTest</param>
+              <param>org.apache.bookkeeper.bookie.FileInfoTest</param>
+              <param>org.apache.bookkeeper.bookie.storage.ldb.LedgerMdIndexSetMasterTest</param>
+              <param>org.apache.bookkeeper.bookie.storage.ldb.LedgerMdIndexSetTest</param>
+
+            </targetTests>
+          </configuration>
+          <executions>
+            <execution>
+              <phase>test-compile</phase>
+              <goals>
+                <goal>mutationCoverage</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
       <pluginManagement>
         <plugins>
           <plugin>
@@ -420,6 +426,9 @@
           </executions>
           <configuration>
             <argLine>-javaagent:src/test/resources/ba-dua-agent-rt-0.6.0-all.jar -Doutput.file=target/badua.ser</argLine>
+            <trimStackTrace>false</trimStackTrace>
+            <testFailureIgnore>true</testFailureIgnore>
+            <rerunFailingTestsCount>0</rerunFailingTestsCount>
           </configuration>
         </plugin>
       </plugins>
