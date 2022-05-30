@@ -39,27 +39,28 @@ public class LedgerMdIndexSetTest {
         //Create new LedgerData as shown in setMasterKey
         DbLedgerStorageDataFormats.LedgerData data = DbLedgerStorageDataFormats.LedgerData.newBuilder().setExists(true).setFenced(false).setMasterKey(ByteString.copyFrom(ByteBuffer.wrap("Chiave".getBytes()))).build();
         return Arrays.asList(new Object[][]{
-                {8, data},
-                {1,null},
-                {8, data},
+                {data,false},
+                {null,false},
+                {data,true},
+
 
         });
     }
 
-    public LedgerMdIndexSetTest(long ledgerId, DbLedgerStorageDataFormats.LedgerData data) throws IOException {
-        configure(ledgerId, data);
+    public LedgerMdIndexSetTest(DbLedgerStorageDataFormats.LedgerData data,boolean notPresent) throws IOException {
+        configure(data,notPresent);
     }
 
-    private void configure(long ledgerId, DbLedgerStorageDataFormats.LedgerData data) throws IOException {
+    private void configure(DbLedgerStorageDataFormats.LedgerData data,boolean notPresent) throws IOException {
         //Since we don't want to create ledgers and the system behind the metadataIndex we will mock the external system
         ServerConfiguration sconf = new ServerConfiguration();//whatever server config
         HashMap<byte[],byte[]> ledger = new HashMap<>();//This will be our ledger, as per example in row 82 of LedgerMetadataIndex.java
 
         ByteBuffer buf = ByteBuffer.allocate(8);
-        buf.putLong(ledgerId); //make the id a byte array to use as a key
+        buf.putLong(1); //make the id a byte array to use as a key
 
-        if(data!=null){
-            ledger.put(buf.array(),data.toByteArray());
+        if(notPresent){
+            ledger.put(buf.array(), data.toByteArray());
         }
 
         when(this.fact.newKeyValueStorage(any(), any(), any(),any())).thenReturn(this.keyValueStorage);//We return our own mocked implementation of a keyvalue storage, without using the external factory
@@ -73,7 +74,7 @@ public class LedgerMdIndexSetTest {
         NullStatsLogger log = new NullStatsLogger(); //We don't log any stat
 
         this.lmi = new LedgerMetadataIndex(sconf, this.fact, "tmp",log);//create a ledger with basePath in tmp
-        this.id = ledgerId;
+        this.id = 1;
         this.data = data;
     }
 

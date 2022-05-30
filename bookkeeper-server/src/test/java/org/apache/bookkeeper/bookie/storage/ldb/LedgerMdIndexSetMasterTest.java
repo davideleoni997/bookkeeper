@@ -40,30 +40,33 @@ public class LedgerMdIndexSetMasterTest {
     public static Collection<Object[]> testParameters(){
 
         return Arrays.asList(new Object[][]{
-                {-1,"".getBytes(),false},
-                {1,"key".getBytes(),false},
-                {1,"".getBytes(),false},
-                {1,null,false},
-                {1,"key".getBytes(),true},
-                {1,"chiave".getBytes(),true},
+                {-1,"".getBytes(),false,false},
+                {1,"key".getBytes(),false,false},
+                {1,"".getBytes(),false,false},
+                {1,null,false,false},
+                {1,"key".getBytes(),true,false},
+                {1,"chiave".getBytes(),true,false},
+                {1,"".getBytes(),true,false},//Stringa vuota rappresentata da 6 bytes di valore 0.
+                {1,"key".getBytes(),true,true},
         });
     }
 
-    public LedgerMdIndexSetMasterTest(long id, byte[] key,boolean isKeySet) throws IOException {
-        configure(id, key, isKeySet);
+    public LedgerMdIndexSetMasterTest(long id, byte[] key,boolean isKeySet,boolean noLedgerPresent) throws IOException {
+        configure(id, key, isKeySet,noLedgerPresent);
     }
 
-    private void configure(long ledgerId, byte[] key, boolean isKeySet) throws IOException {
+    private void configure(long ledgerId, byte[] key, boolean isKeySet,boolean noLedgerPresent) throws IOException {
         //Since we don't want to create ledgers and the system behind the metadataIndex we will mock the external system
         ServerConfiguration sconf = new ServerConfiguration();//whatever server config
         HashMap<byte[],byte[]> ledger = new HashMap<>();//This will be our ledger, as per example in row 82 of LedgerMetadataIndex.java
 
         ByteBuffer buf = ByteBuffer.allocate(8);
         buf.putLong(ledgerId); //make the id a byte array to use as a key
-        if(isKeySet)
-            ledger.put(buf.array(),DbLedgerStorageDataFormats.LedgerData.newBuilder().setExists(true).setFenced(false).setMasterKey(ByteString.copyFrom("chiave".getBytes())).build().toByteArray());
-        else// 0 bytes array
-            ledger.put(buf.array(),DbLedgerStorageDataFormats.LedgerData.newBuilder().setExists(true).setFenced(false).setMasterKey(ByteString.copyFrom(new byte[]{0,0})).build().toByteArray());
+        if(!noLedgerPresent)
+            if(isKeySet)
+                ledger.put(buf.array(),DbLedgerStorageDataFormats.LedgerData.newBuilder().setExists(true).setFenced(false).setMasterKey(ByteString.copyFrom("chiave".getBytes())).build().toByteArray());
+            else// 0 bytes array
+                ledger.put(buf.array(),DbLedgerStorageDataFormats.LedgerData.newBuilder().setExists(true).setFenced(false).setMasterKey(ByteString.copyFrom(new byte[]{0,0})).build().toByteArray());
 
 
         when(this.fact.newKeyValueStorage(any(), any(), any(),any())).thenReturn(this.keyValueStorage);//We return our own mocked implementation of a keyvalue storage, without using the external factory
