@@ -7,6 +7,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import  org.junit.Assert;
+import org.mockito.Mockito;
+import org.mockito.Spy;
 
 
 import java.io.File;
@@ -24,6 +26,7 @@ import java.util.logging.Logger;
 
 @RunWith(value= Parameterized.class)
 public class FileInfoTest {
+
     private FileInfo fi;
     private File newFile;
     private long size;
@@ -34,6 +37,7 @@ public class FileInfoTest {
     @Parameterized.Parameters
     public static Collection<Object[]> testParameters() throws IOException {
         File baseFileEqual = File.createTempFile("test","file");
+
         return Arrays.asList(new Object[][]{
                 {File.createTempFile("first","file"),File.createTempFile("new","stuff"),Long.MAX_VALUE,false,false,false},
                 {File.createTempFile("second","file"),File.createTempFile("another","thing"),0,false,false,false},
@@ -55,8 +59,6 @@ public class FileInfoTest {
     private void configure(File basedir, File newFile,long size,boolean existRloc,boolean notReadable,boolean close) throws IOException {
         FileInfo fi = new FileInfo(basedir,"1".getBytes(),0);
         File rlocFile = null;
-        if(newFile != null && newFile.getName().contains("third"))
-            newFile.setReadOnly();
         if(basedir!= null)
             fi.write(new ByteBuffer[]{ByteBuffer.wrap("SomeRandomDataInTheBasedirFile".getBytes())},0);
 
