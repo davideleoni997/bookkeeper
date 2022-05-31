@@ -57,6 +57,7 @@ public class LedgerMdIndexSetMasterTest {
                 {1,"".getBytes(),true,false,false},
                 {1,"key".getBytes(),true,true,false},
                 {1,"key".getBytes(),false, false, true},
+                {1,"key".getBytes(),false, true, true},
         });
     }
 

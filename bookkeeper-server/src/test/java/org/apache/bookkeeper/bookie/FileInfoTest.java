@@ -1,14 +1,13 @@
 package org.apache.bookkeeper.bookie;
 
 
-import org.junit.After;
+
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import  org.junit.Assert;
-import org.mockito.Mockito;
-import org.mockito.Spy;
+
 
 
 import java.io.File;
@@ -16,8 +15,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Level;
