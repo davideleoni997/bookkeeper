@@ -14,12 +14,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.logging.Level;
+
 
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.internal.matchers.Null;
-import org.slf4j.Logger;
+
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -41,31 +39,29 @@ public class LedgerMdIndexSetMasterTest {
     private byte[] key;
     private LedgerMetadataIndex lmi;
 
-    @Mock
-    private Logger log = Mockito.mock(Logger.class);
+
 
     @Parameterized.Parameters
     public static Collection<Object[]> testParameters(){
 
         return Arrays.asList(new Object[][]{
-                {-1,"".getBytes(),false,false,false},
-                {1,"key".getBytes(),false,false,false},
-                {1,"".getBytes(),false,false,false},
-                {1,null,false,false,false},
-                {1,"key".getBytes(),true,false,false},
-                {1,"chiave".getBytes(),true,false,false},
-                {1,"".getBytes(),true,false,false},
-                {1,"key".getBytes(),true,true,false},
-                {1,"key".getBytes(),false, false, true},
-                {1,"key".getBytes(),false, true, true},
+                {-1,"".getBytes(),false,false},
+                {1,"key".getBytes(),false,false},
+                {1,"".getBytes(),false,false},
+                {1,null,false,false},
+                {1,"key".getBytes(),true,false},
+                {1,"chiave".getBytes(),true,false},
+                {1,"".getBytes(),true,false},
+                {1,"key".getBytes(),true,true},
+                {1,"key".getBytes(),false, false},
         });
     }
 
-    public LedgerMdIndexSetMasterTest(long id, byte[] key,boolean isKeySet,boolean noLedgerPresent,boolean reflect) throws IOException, NoSuchFieldException, IllegalAccessException {
-        configure(id, key, isKeySet,noLedgerPresent,reflect);
+    public LedgerMdIndexSetMasterTest(long id, byte[] key,boolean isKeySet,boolean noLedgerPresent) throws IOException, NoSuchFieldException, IllegalAccessException {
+        configure(id, key, isKeySet,noLedgerPresent);
     }
 
-    private void configure(long ledgerId, byte[] key, boolean isKeySet,boolean noLedgerPresent,boolean reflect) throws IOException, IllegalAccessException, NoSuchFieldException {
+    private void configure(long ledgerId, byte[] key, boolean isKeySet,boolean noLedgerPresent) throws IOException, IllegalAccessException, NoSuchFieldException {
         //Since we don't want to create ledgers and the system behind the metadataIndex we will mock the external system
         ServerConfiguration sconf = new ServerConfiguration();//whatever server config
         HashMap<byte[],byte[]> ledger = new HashMap<>();//This will be our ledger, as per example in row 82 of LedgerMetadataIndex.java
@@ -88,21 +84,6 @@ public class LedgerMdIndexSetMasterTest {
         when(this.cI.next()).then(invocationOnMock -> this.iter.next());
 
         NullStatsLogger logger = new NullStatsLogger(); //We don't log any stat
-
-        if(reflect) {
-            when(log.isDebugEnabled()).thenReturn(true);
-            doAnswer(invocationOnMock ->{
-                java.util.logging.Logger.getGlobal().log(Level.INFO, "MockedLog");
-                return null;
-            }).when(log).debug(any(), any(Objects.class));
-
-            java.lang.reflect.Field field = LedgerMetadataIndex.class.getDeclaredField("log");
-            field.setAccessible(true);
-            java.lang.reflect.Field modifiersField = Field.class.getDeclaredField("modifiers");
-            modifiersField.setAccessible(true);
-            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-            field.set(null, log);
-        }
 
         this.lmi = new LedgerMetadataIndex(sconf, this.fact, "tmp",logger);//create a ledger with basePath in tmp
         this.id = ledgerId;

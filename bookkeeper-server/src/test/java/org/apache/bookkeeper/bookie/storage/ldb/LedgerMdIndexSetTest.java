@@ -48,20 +48,19 @@ public class LedgerMdIndexSetTest {
         //Create new LedgerData as shown in setMasterKey
         DbLedgerStorageDataFormats.LedgerData data = DbLedgerStorageDataFormats.LedgerData.newBuilder().setExists(true).setFenced(false).setMasterKey(ByteString.copyFrom(ByteBuffer.wrap("Chiave".getBytes()))).build();
         return Arrays.asList(new Object[][]{
-                {data,false,false},
-                {null,false,false},
-                {data,true,false},
-                {data,false,true}
+                {data,false},
+                {null,false},
+                {data,true},
 
 
         });
     }
 
-    public LedgerMdIndexSetTest(DbLedgerStorageDataFormats.LedgerData data,boolean notPresent,boolean reflect) throws IOException, NoSuchFieldException, IllegalAccessException {
-        configure(data,notPresent,reflect);
+    public LedgerMdIndexSetTest(DbLedgerStorageDataFormats.LedgerData data,boolean notPresent) throws IOException, NoSuchFieldException, IllegalAccessException {
+        configure(data,notPresent);
     }
 
-    private void configure(DbLedgerStorageDataFormats.LedgerData data,boolean notPresent,boolean reflect) throws IOException, NoSuchFieldException, IllegalAccessException {
+    private void configure(DbLedgerStorageDataFormats.LedgerData data,boolean notPresent) throws IOException, NoSuchFieldException, IllegalAccessException {
         //Since we don't want to create ledgers and the system behind the metadataIndex we will mock the external system
         ServerConfiguration sconf = new ServerConfiguration();//whatever server config
         HashMap<byte[],byte[]> ledger = new HashMap<>();//This will be our ledger, as per example in row 82 of LedgerMetadataIndex.java
@@ -82,20 +81,6 @@ public class LedgerMdIndexSetTest {
         when(this.cI.next()).then(invocationOnMock -> this.iter.next());
 
         NullStatsLogger logger = new NullStatsLogger();
-        if(reflect) {
-            when(log.isDebugEnabled()).thenReturn(true);
-            doAnswer(invocationOnMock ->{
-                    java.util.logging.Logger.getGlobal().log(Level.INFO, "MockedLog");
-                    return null;
-                }).when(log).debug(any(), any(Objects.class));
-
-            java.lang.reflect.Field field = LedgerMetadataIndex.class.getDeclaredField("log");
-            field.setAccessible(true);
-            java.lang.reflect.Field modifiersField = Field.class.getDeclaredField("modifiers");
-            modifiersField.setAccessible(true);
-            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-            field.set(null, log);
-        }
 
         this.lmi = new LedgerMetadataIndex(sconf, this.fact, "tmp",logger);//create a ledger with basePath in tmp
         this.id = 1;

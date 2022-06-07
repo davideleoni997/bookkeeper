@@ -71,7 +71,6 @@ public class FileInfoTest {
             if(rlocFile!=null) {
                  rlocFile.setReadable(false,false);
             }
-            Logger.getGlobal().log(Level.INFO,String.valueOf(rlocFile.exists()));
         }
         if(close)
             fi.close(true);

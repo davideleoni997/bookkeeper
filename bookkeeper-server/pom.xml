@@ -325,6 +325,8 @@
           <artifactId>pitest-maven</artifactId>
           <version>1.6.2</version>
           <configuration>
+            <historyInputFile>${basedir}/target/incremental.txt</historyInputFile>
+            <historyOutputFile>${basedir}/target/incremental.txt</historyOutputFile>
             <targetClasses>
               <param>org.apache.bookkeeper.bookie.FileInfo</param>
               <param>org.apache.bookkeeper.bookie.storage.ldb.LedgerMetadataIndex</param>
