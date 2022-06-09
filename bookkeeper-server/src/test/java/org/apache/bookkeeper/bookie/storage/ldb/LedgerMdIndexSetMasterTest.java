@@ -51,7 +51,7 @@ public class LedgerMdIndexSetMasterTest {
                 {1,null,false,false},
                 {1,"key".getBytes(),true,false},
                 {1,"chiave".getBytes(),true,false},
-                {1,"".getBytes(),true,false},
+                {1,new byte[]{0,0,0,0,0,0},true,false},
                 {1,"key".getBytes(),true,true},
                 {1,"key".getBytes(),false, false},
         });
@@ -94,7 +94,7 @@ public class LedgerMdIndexSetMasterTest {
     public void testSetMaster(){
        try {
            lmi.setMasterKey(this.id, this.key);
-           Assert.assertEquals(ByteBuffer.wrap(this.key), ByteBuffer.wrap(lmi.get(this.id).getMasterKey().toByteArray()));
+           Assert.assertEquals(ByteBuffer.wrap(this.key).toString(), ByteBuffer.wrap(lmi.get(this.id).getMasterKey().toByteArray()).toString());
        } catch (Exception e){
            if(this.key == null)
                 Assert.assertEquals(e.getClass(),NullPointerException.class);
